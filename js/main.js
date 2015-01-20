@@ -13,8 +13,9 @@
         //
         chrome.runtime.onMessage.addListener(
           function(request, sender, sendResponse) {
-            if (request.action) {
-              sendResponse(main[request.action]());
+            console.log(request.action);
+            if (request.action && main[request.action]) {
+              sendResponse(main[request.action]() || {});
             }
           });
 

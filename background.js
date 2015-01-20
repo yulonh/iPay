@@ -26,8 +26,8 @@
       chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
 
-          if (request.action) {
-            sendResponse(iPay[request.action]());
+          if (request.action && iPay[request.action]) {
+            sendResponse(iPay[request.action]() || {});
           }
         });
     },
@@ -41,7 +41,8 @@
     start: function() {
       chrome.tabs.sendMessage(mainTab.id, {
         action: "accounts"
-      }, function(accounts) {
+      }, function(data) {
+        accounts = data;
         if (accounts.length) {
           aIndex = 0;
           tIndex = 0;
@@ -55,7 +56,9 @@
 
     },
     nextAccount: function() {
-      return accounts[aIndex++];
+      return {
+        account: accounts[aIndex++]
+      };
     },
     verification: function() {
 

@@ -2,7 +2,7 @@
   "name": "Cookie API Test Extension",
   "version": "0.8",
   "description": "Testing Cookie API",
-  "permissions": ["cookies", "tabs", "http://*/*", "https://*/*"],
+  "permissions": ["cookies", "webRequest","webRequestBlocking", "tabs", "http://*/*", "https://*/*"],
   "icons": {
     "16": "cookie.png",
     "48": "cookie.png",

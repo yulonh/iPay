@@ -90,11 +90,12 @@
                               myForm.action = data.ebillingurl;
                               myForm.target = '_blank';
                               myForm.submit();
-                              setTimeout("formSubmit('post','Step3Action','params','" + data.params + "','reParams','" + data.reParams + "','payModelId'," + data.payModelId + ",'payTypeId'," + data.payTypeId + ",'feeModelId'," + data.feeModelId + ",'_self')", 500);
+                              setTimeout(function() {
+                                SubmitAction(data);
+                              }, 500);
                             } else
                             if (!data.ydurl) {
-                              formSubmit('post', 'Step3Action', 'params', data.params, 'reParams', data.reParams,
-                                'payModelId', data.payModelId, 'payTypeId', data.payTypeId, 'feeModelId', data.feeModelId, '_self');
+                              formSubmit(data);
                             } else {
                               location.href = data.ydurl;
                             }
@@ -126,127 +127,24 @@
     });
   }
 
-  function onPayTypeLoaded(html) {
-
-    chrome.runtime.sendMessage({
-      action: "nextAccount"
-    }, function(res) {
-      if (!account) {
-        console.log('complete!');
-        return;
+  function formSubmit(data) {
+    var form = document.createElement('form');
+    form.action = "Step3Action";
+    for (var k in data) {
+      if(data.hasOwnProperty(k)){
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = k;
+        input.value = data[k];
+        form.appendChild(input);
       }
-
-      var wrap = $(html);
-      wrap.find('#ydsj_yzm_cashTab [name="cashRadio"]').each(function() {
-
-        $.post('SubmitAction', {
-            "params": data.params,
-            "prodId": 435005,
-            "phone": account,
-            "payModelId": 1,
-            "payTypeId": 3,
-            "feeModelId": $(this).attr("id").replace("ydsj_cashRadio_con3_", ""),
-            "oneTag": true,
-            "gkModel": 1
-          },
-          function(data) {
-            console.log(data);
-          }, 'json');
-
-      });
-
-    });
-
+    };
+    form.submit();
   }
 
-  function formSubmit(type, action, params, paramsValues, reParams, reParamsValue,
-    payModelId, payModelIdValue, payTypeId, payTypeIdValue,
-    feeModelId, feeModelIdValue, target) {
-
-    var form1 = $("<form></form>")
-    form1.attr({
-      "action": action,
-      "method": type,
-      "target": target
-    });
-    var myInput1 = $("<input type='hidden'/>");
-    myInput1.attr('value', paramsValues);
-    myInput1.attr('name', params);
-    form1.append(myInput1);
-
-    var myInput2 = $("<input type='hidden'/>");
-    myInput2.attr('value', payModelIdValue);
-    myInput2.attr('name', payModelId);
-    form1.append(myInput2);
-
-    var myInput3 = $("<input type='hidden'/>");
-    myInput3.attr('value', payTypeIdValue);
-    myInput3.attr('name', payTypeId);
-    form1.append(myInput3);
-
-    var myInput4 = $("<input type='hidden'/>");
-    myInput4.attr('value', feeModelIdValue);
-    myInput4.attr('name', feeModelId);
-    form1.append(myInput4);
-
-    var myInput5 = $("<input type='hidden'/>");
-    myInput5.attr('value', reParamsValue);
-    myInput5.attr('name', reParams);
-    form1.append(myInput5);
-
-    form1.appendTo("body");
-    form1.css('display', 'none');
-    form1.submit();
-    form1.remove();
-  }
-
-  $(document).on('ajaxComplete', function(e, xhr, options) {
-    //console.log(xhr, options);
-  });
   $(document).on('ajaxError', function(e, xhr, options) {
     if (options.url === "http://ocr.yulonh.com/") {
       getRandCode();
     }
   });
-
-  // if (href.indexOf('http://pay.tianxiafu.cn/435_km_0.html') !== -1) {}
-
-  // if (href.indexOf('http://pay.tianxiafu.cn//Step2Action') !== -1) {
-  //
-  // $(doc).on('ajaxComplete', function(e, xhr, opt) {
-  //   //提交结果判定
-  //   if (opt.url === 'SubmitAction') {
-  //     var res = JSON.parse(xhr.responseText);
-  //     if (0 === res.resultTag) {
-  //       testNext();
-  //     } else {
-  //       tIndex = 0;
-  //     }
-  //   }
-
-  //   //页面加载完毕
-  //   if (opt.url.indexOf('FeeModelAction?modelId=') !== -1) {
-  //     phoneNode = $('#con3phone1');
-  //     nextBtn = $('#ydsjbtnCon3FormSubmit');
-  //     types = $('#ydsj_yzm_cashTab :radio');
-  //     tLength = types.length;
-  //     testNext();
-  //   }
-
-  // });
-  // }
-
-  // if (href.indexOf('/Step3Action') !== -1) {
-  //   availableAccouts[account] = indexWin;
-  //   console.log('Step3Action', aIndex, aLength);
-  //   aIndex++;
-  //   if (aIndex < aLength) {
-  //     this.openIndexWindow();
-  //   } else {
-  //     console.log('all test complete');
-  //   }
-  // }
-
-
-
 }();

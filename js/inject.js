@@ -1,4 +1,8 @@
 ~ function() {
+  if(location.indexOf('Step3Action')!==-1){
+    
+    return;
+  }
   //
   var phoneNode, nextBtn, types,
     tLength = 0;

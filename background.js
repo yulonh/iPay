@@ -1,6 +1,6 @@
 ~ function() {
   var mainTab;
-  var indexUrl = 'http://pay.tianxiafu.cn/435_km_0.html?modelIds2=1&come=zhaoka_ydyy';
+  var indexUrl = 'http://pay.tianxiafu.cn/191_km_0.html?modelIds2=1&come=zhaoka_ydyy';
   var cookies = {};
   chrome.browserAction.onClicked.addListener(function(tab) {
     if (mainTab) {
@@ -23,8 +23,29 @@
   var aIndex = 0,
     tIndex = 0;
 
+  function cookieObject(cookie) {
+    var cookies = cookie.match(/\S+=\S+/g);
+    var length = cookies.length;
+    var object = {};
+    for (var i = 0; i < length; i++) {
+      var nv = cookies[i].split('=');
+      object[nv[0]] = nv[1].replace(';', '');
+    };
+    return object;
+  }
+
+  function object2Cookie(object) {
+    var cookie = [];
+    for (var k in object) {
+      var val = object[k];
+      cookie.push([k, val].join('='));
+    };
+    return cookie.join(';');
+  }
+
   var iPay = {
     init: function() {
+      //
       chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
           if (request.action && iPay[request.action]) {
@@ -32,29 +53,36 @@
           }
         });
       //
-      chrome.webRequest.onBeforeSendHeaders.addListener(
-        function(details) {
-          for (var i = 0; i < details.requestHeaders.length; ++i) {
-            var cookie = cookies[details.tabId];
-            console.log('replace cookie with ', cookie, ' in ', details.url);
-            if (details.requestHeaders[i].name === 'Cookie' && cookie) {
-              details.requestHeaders[i].value = cookie;
-              break;
-            }
-          }
-          return {
-            requestHeaders: details.requestHeaders
-          };
-        }, {
-          urls: ["*://pay.tianxiafu.cn/*"]
-        }, ["blocking", "requestHeaders"]);
+      // chrome.webRequest.onBeforeSendHeaders.addListener(
+      //   function(details) {
+      //     for (var i = 0; i < details.requestHeaders.length; ++i) {
+      //       var cookie = cookies[details.tabId];
+      //       if (details.requestHeaders[i].name === 'Cookie' && cookie) {
+      //         var raw = cookieObject(details.requestHeaders[i].value);
+      //         var change = cookieObject(cookie);
+      //         for (var k in change) {
+      //           if (change.hasOwnProperty(k)) {
+      //             raw[k] = change[k];
+      //           }
+      //         }
+      //         details.requestHeaders[i].value = object2Cookie(raw);
+      //         // console.log(details.tabId, details.requestHeaders[i].value);
+      //         break;
+      //       }
+      //     }
+      //     return {
+      //       requestHeaders: details.requestHeaders
+      //     };
+      //   }, {
+      //     urls: ["*://pay.tianxiafu.cn/*"]
+      //   }, ["blocking", "requestHeaders"]);
       //
       chrome.webRequest.onHeadersReceived.addListener(
         function(details) {
           for (var i = 0; i < details.responseHeaders.length; ++i) {
             if (details.responseHeaders[i].name === 'Set-Cookie') {
-              cookies[details.tabId] = details.responseHeaders[i].value;
-              console.log('set cookie with ', details.responseHeaders[i].value, ' by ', details.url);
+              cookies[details.tabId] = details.responseHeaders[i].value.replace('Path=/; HttpOnly', '');
+              console.log(details.tabId, 'set cookie with ', cookies[details.tabId], ' by ', details.url);
               break;
             }
           }
@@ -64,18 +92,6 @@
         }, {
           urls: ["*://pay.tianxiafu.cn/*"]
         }, ["blocking", "responseHeaders"]);
-      //
-      // chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-      //   if (tab.url === indexUrl) {
-      //     chrome.cookies.get({
-      //       url: indexUrl,
-      //       name: 'JSESSIONID'
-      //     }, function(cookie) {
-      //       cookies[tabId] = ['JSESSIONID', cookie.value].join('=');
-      //       console.log(cookies);
-      //     });
-      //   }
-      // });
     },
     openIndexWindow: function() {
       if (!accounts[aIndex]) {
@@ -118,6 +134,5 @@
   };
 
   iPay.init();
-
 
 }();

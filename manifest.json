@@ -2,7 +2,7 @@
   "name": "Cookie API Test Extension",
   "version": "0.8",
   "description": "Testing Cookie API",
-  "permissions": ["cookies", "webRequest","webRequestBlocking", "tabs", "http://*/*", "https://*/*"],
+  "permissions": ["cookies", "webRequest", "webRequestBlocking", "tabs", "http://*/*", "https://*/*"],
   "icons": {
     "16": "cookie.png",
     "48": "cookie.png",
@@ -16,8 +16,17 @@
   },
   "content_scripts": [{
     "matches": ["http://pay.tianxiafu.cn/*"],
-    "js": ["js/zepto.min.js", "js/inject.js"],
+    "js": ["js/zepto.min.js"],
+    "run_at": "document_start"
+  }, {
+    "matches": ["http://pay.tianxiafu.cn/191_km_0.html*"],
+    "js": ["js/crack_code.js"],
+    "run_at": "document_end"
+  }, {
+    "matches": ["http://pay.tianxiafu.cn//Step2Action*"],
+    "js": ["js/injector.js"],
     "run_at": "document_end"
   }],
+  "web_accessible_resources": ["js/*.js"],
   "manifest_version": 2
 }

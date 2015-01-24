@@ -10,16 +10,26 @@
         }, function(response) {
           console.log(response);
         });
-        //
-        chrome.runtime.onMessage.addListener(
-          function(request, sender, sendResponse) {
-            console.log(request.action);
-            if (request.action && main[request.action]) {
-              sendResponse(main[request.action]() || {});
-            }
-          });
-
       }, this));
+
+      $('#step2').on('click', function(e) {
+        e.preventDefault();
+        //
+        chrome.runtime.sendMessage({
+          action: "start"
+        }, function(response) {
+          console.log(response);
+        });
+      });
+
+      //
+      chrome.runtime.onMessage.addListener(
+        function(request, sender, sendResponse) {
+          console.log(request.action);
+          if (request.action && main[request.action]) {
+            sendResponse(main[request.action]() || {});
+          }
+        });
     },
     accounts: function() {
       var accounts = $('#accounts').val().trim();
